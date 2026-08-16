@@ -1,4 +1,4 @@
-# Full Stack Pomofocus
+- A self-hosted video streaming platform designed and implemented from scratch, with Direct Play, HLS transcoding, authentication, media indexing, playback sessions, watch history and multi-device support.
 
 ## Technology Stack and Features
 
@@ -14,7 +14,9 @@
 - CI (continuous integration) and CD (continuous deployment) based on Jenkins.
 
 ## How To Use It
+
 - GitHub: https://viblo.asia/p/tao-pull-request-dung-cach-bWrZnwkrlxw
+
 ## Backend Development
 
 ## Frontend Development
