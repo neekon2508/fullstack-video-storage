@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Đường dẫn thư mục lưu log -->
+    <property name="LOG_DIR" value="./logs" />
+    <property name="APP_NAME" value="my-app" />
+
+    <!-- Định dạng hiển thị log -->
+    <property name="LOG_PATTERN" 
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [tenant=%X{tenantId}] %-5level %logger{36} - %msg%n" />
+
+    <!-- Appender ghi log ra File và Xoay vòng theo ngày -->
+    <appender name="DAILY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Path của file log đang ghi ở thời điểm hiện tại -->
+        <file>${LOG_DIR}/${APP_NAME}.log</file>
+
+        <!-- Chính sách xoay vòng: Theo Thời gian (Ngày) và Kích thước -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 
+               Cú pháp %d{yyyy-MM-dd} báo cho Logback biết phải xoay file mỗi ngày vào lúc 00:00.
+               Đuôi .gz giúp Logback tự động nén log lại để tiết kiệm dung lượng đĩa.
+            -->
+            <fileNamePattern>${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            
+            <!-- Giữ log trong vòng 30 ngày, quá 30 ngày tự xóa -->
+            <maxHistory>30</maxHistory>
+            
+            <!-- Mỗi file log trong 1 ngày tối đa 50MB, vượt quá sẽ tạo file thứ 2 (%i = 1, 2, 3...) -->
+            <maxFileSize>50MB</maxFileSize>
+            
+            <!-- Tổng dung lượng folder log tối đa là 10GB -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- Console Appender (Để xem log trực tiếp trên màn hình Terminal) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <withJansi>false</withJansi>
+    </appender>
+
+    <logger name="org.hibernate.SQL" level="DEBUG" />
+    <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" />
+    <!-- <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" /> -->
+
+    <!-- Áp dụng Appender vào Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="DAILY_FILE" />
+    </root>
+
+</configuration>
