@@ -2,6 +2,7 @@ package com.api.common.filter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.api.auth.service.UserDetailsImpl;
+import com.api.autho.service.AuthorizationService;
 import com.api.common.constant.CommonConstants;
 import com.api.common.exception.ErrorCode;
 import com.api.common.model.CommonResponse;
@@ -35,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
+    private final AuthorizationService authorizationService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -56,10 +59,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Claims claims = jwtUtil.extractClaims(token, false);
                     Long id = claims.get("id", Long.class);
                     String username = claims.get("username", String.class);
+                    // --- Autho: resolve permission ngay sau khi Authen thành công ---
+                    // Có cache (Caffeine, xem CacheConfig) nên không tốn query mỗi request
+                    // trừ lần đầu / sau khi cache hết hạn hoặc bị evict.
+                    Set<String> permissions = authorizationService.resolveEffectivePermissions(id);
                     UserDetailsImpl userDetails = UserDetailsImpl
                             .builder()
                             .id(id)
                             .username(username)
+                            .permissions(permissions)
                             .build();
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, Collections.emptyList());

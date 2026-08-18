@@ -22,6 +22,7 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** vd: media:read, transcode:cancel, library:scan */
     @Column(name = "code", nullable = false, length = 128, unique = true)
     private String code;
 

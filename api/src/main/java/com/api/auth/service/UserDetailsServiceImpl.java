@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (optUser.isEmpty())
             throw new UsernameNotFoundException("User not found: " + username);
         User user = optUser.get();
-        if (user.getIsActive())
+        if (!user.getIsActive())
             throw new DisabledException("Account is locked: " + username);
         return UserDetailsImpl
                 .builder()

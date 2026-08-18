@@ -2,16 +2,17 @@ package com.api.common.interceptor;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.api.annotation.RequirePermission;
+import com.api.auth.service.UserDetailsImpl;
+import com.api.common.constant.CommonConstants;
+import com.api.common.exception.ErrorCode;
+import com.api.common.model.CommonResponse;
+import com.api.common.util.SecurityUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import backend.auth.service.UserDetailsImpl;
-import backend.common.constant.CommonConstants;
-import backend.common.exception.ErrorCode;
-import backend.common.model.CommonResponse;
-import backend.common.util.SecurityUtil;
-import backend.common.util.ValidateUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,21 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        UserDetailsImpl user = SecurityUtil.getUserDetails();
-        List<String> functions = user.getFunctions();
+        // Không phải request tới controller method (vd static resource) -> bỏ qua
+        if (!(handler instanceof HandlerMethod handlerMethod))
+            return true;
+        // Ưu tiên annotation trên method, fallback annotation trên class
+        RequirePermission required = handlerMethod.getMethodAnnotation(RequirePermission.class);
+        if (required == null)
+            required = handlerMethod.getBeanType().getAnnotation(RequirePermission.class);
+        // API không khai báo @RequirePermission -> chỉ cần đã authenticate (JwtAuthenticationFilter
+        // đã chặn từ trước nếu chưa có token hợp lệ), không kiểm tra permission cụ thể.
+        if (required == null)
+            return true;
+       UserDetailsImpl user = SecurityUtil.getUserDetails();
         String uri = request.getServletPath();
-
-        if (ValidateUtil.isEmpty(functions)
-                || !functions.contains(uri)) {
-            log.error("Inaccessible Api, Access url is " + uri);
+        if (user == null || !user.hasPermission(required.value())) {
+            log.error("Inaccessible Api, Access url is {}, required permission is {}", uri, required.value());
             responseWriter(request, response, ErrorCode.NOT_AUTHORIZED_EXCEPTION.getCode());
             return false;
         }

@@ -22,11 +22,11 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableJpaRepositories(basePackages = {
-        "backend" }, entityManagerFactoryRef = "primaryEntityManagerFactory", transactionManagerRef = "primaryTransactionManager")
+        "com.api" }, entityManagerFactoryRef = "primaryEntityManagerFactory", transactionManagerRef = "primaryTransactionManager")
 @RequiredArgsConstructor
 public class DataSourceConfig {
 
-    @Value("${jpa.entity-packages:backend}")
+    @Value("${jpa.entity-packages:com.api}")
     private String entityPackages;
 
     @Primary

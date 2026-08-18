@@ -34,25 +34,26 @@ public class JwtUtil {
     @Value("${jwt.refresh-token-expiration-time}")
     private long refreshExp;
 
-    public String generateAccessToken(UserDetailsImpl user) {
+    public String generateAccessToken(Long id, String username) {
         LocalDateTime expiry = LocalDateTime.now().plus(Duration.ofSeconds(accessExp));
         Date expiryDate = Date.from(expiry.atZone(ZoneId.systemDefault()).toInstant());
 
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .claim("id", user.getId())
-                .claim("username", user.getUsername())
+                .claim("id", id)
+                .claim("username", username)
                 .signWith(Keys.hmacShaKeyFor(accessSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(Long id, String username) {
         LocalDateTime expiry = LocalDateTime.now().plus(Duration.ofSeconds(refreshExp));
         Date expiryDate = Date.from(expiry.atZone(ZoneId.systemDefault()).toInstant());
 
         return Jwts.builder()
+                .setId(Long.toString(id))
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)

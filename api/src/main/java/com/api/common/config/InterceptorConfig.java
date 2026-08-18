@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import backend.common.interceptor.AuthorizationInterceptor;
+import com.api.common.interceptor.AuthorizationInterceptor;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -22,8 +23,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        // registry.addInterceptor(authorizationInterceptor)
-        // .addPathPatterns("/**")
-        // .excludePathPatterns(authorizationExcludePaths);
+        registry.addInterceptor(authorizationInterceptor)
+        .addPathPatterns("/**")
+        .excludePathPatterns(authorizationExcludePaths);
     }
 }

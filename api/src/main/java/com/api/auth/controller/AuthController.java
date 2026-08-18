@@ -1,4 +1,4 @@
-package backend.auth.controller;
+package com.api.auth.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

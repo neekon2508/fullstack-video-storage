@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    primary:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://neekon2508.onthewifi.com:3306/movie?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true
+      username: neekon
+      password: ${DB_PASSWORD:Nghia2508@}
+      pool-name: PrimaryHikariPool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idel-timeout: 300000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      leak-detection-threshold: 2000
+  mail:
+    host: smtp.gmail.com
+    username: neekon250803@gmail.com
+    password: zvzvszqxvhwlafkf
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+jasypt:
+  encryptor:
+    password: Ami2025!
+
+interceptor:
+  authorization:
+    exclude-paths: /test/**,/swagger-ui.html,/swagger-ui/**,/login,/error,/v1/sso/**,/v3/api-docs/**

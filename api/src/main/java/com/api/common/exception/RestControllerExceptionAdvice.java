@@ -23,6 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 public class RestControllerExceptionAdvice {
 
         @ExceptionHandler(BusinessException.class)
+        public ResponseEntity<String> customBusinessExceptionHandler(InvalidRefreshTokenException e) {
+                log.error("[customBusinessExceptionHandler]" + e.getMessage(), e);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+
+
+        @ExceptionHandler(BusinessException.class)
         public ResponseEntity<CommonResponse<?>> customBusinessExceptionHandler(BusinessException e) {
                 log.error("[customBusinessExceptionHandler]" + e.getMessage(), e);
 

@@ -8,14 +8,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.api.auth.dto.AuthResponse;
 import com.api.auth.dto.LoginRequest;
 import com.api.auth.dto.LoginResponse;
 import com.api.common.exception.BusinessException;
 import com.api.common.exception.ErrorCode;
+import com.api.common.exception.InvalidRefreshTokenException;
 import com.api.common.util.JwtUtil;
+import com.api.user.UserDTO;
 import com.api.user.entity.User;
 import com.api.user.repository.UserRepository;
+import com.api.user.service.UserService;
 
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthenServiceImpl implements AuthenService {
 
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -35,25 +40,37 @@ public class AuthenServiceImpl implements AuthenService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
         UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
-        String token = jwtUtil.generateAccessToken(user);
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername());
 
-        return LoginResponse.builder()
-                .apiKey(token)
-                .avatar(user.getAvatar())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .func(user.getFunctions())
-                .phone(user.getPhone())
-                .role(user.getRole())
-                .signature(user.getSignature())
-                .tenantId(user.getTenantId())
+        UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .build();
+        AuthResponse authResponse = AuthResponse.builder()
+            .accessToken(accessToken)
+            .user(userDTO)
+            .build();
+        return new LoginResponse(authResponse, refreshToken);
     }
 
     @Override
     public String logout() {
         return "Đăng xuất thành công";
+    }
+
+    @Override
+    public AuthResponse refresh(String refreshToken) {
+        if (refreshToken == null || !jwtUtil.validateToken(refreshToken,true))
+            throw new InvalidRefreshTokenException("Invalid refresh token");
+        Claims claims = jwtUtil.extractClaims(refreshToken, true);
+        Long userId = Long.valueOf(claims.getId());
+        String username = claims.getSubject();
+        String accessToken = jwtUtil.generateAccessToken(userId, username);
+        return AuthResponse.builder()
+            .accessToken(accessToken)
+            .user(new UserDTO(userId, username))
+            .build();
     }
 
     // @Override

@@ -4,8 +4,8 @@
 
 - Spring Boot for the backend
 - React for the frontend
-  - Using hooks, Vite, and other parts of a modern frontend stack.
-  - Material UI and Emotion for the frontend components.
+- Using hooks, Vite, and other parts of a modern frontend stack.
+- Material UI and Emotion for the frontend components.
 - PostgreSQL to save data.
 - MinIO for object storage.
 - FFmpeg for video worker: poll job, download vide, transcode HLS, upload result, update status.
@@ -20,7 +20,7 @@
 ## Backend Development
 
 ## Frontend Development
-
+- Reference: https://github.com/alan2207/bulletproof-react
 ## Deployment
 
 ## Development

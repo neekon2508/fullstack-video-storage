@@ -22,7 +22,7 @@ spring:
       force: true
 
 springdoc:
-  packages-to-scan: backend
+  packages-to-scan: com.api
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   api-docs:
@@ -39,7 +39,7 @@ server:
     context-path: /api/movie
 
 jpa:
-  entity-packages: backend.**.entity
+  entity-packages: com.api.**.entity
 
 jwt:
   access-token-secret-key: access-secret-key-access-secret-key
@@ -50,6 +50,8 @@ jwt:
 request:
   cookie:
     refresh-cookie-name: MOVIE_REFRESH-TOKEN
+    secure: false                              # prd: true
+    same-site: Lax
 
 google:
   client-id: ${GOOGLE_CLIENT_ID:-unsed}
