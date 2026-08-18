@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import backend.auth.dto.request.LoginRequest;
-import backend.auth.dto.response.LoginResponse;
-import backend.auth.service.AuthService;
-import backend.common.constant.CommonConstants;
-import backend.common.exception.ErrorCode;
-import backend.common.model.CommonResponse;
+import com.api.auth.dto.LoginRequest;
+import com.api.auth.dto.LoginResponse;
+import com.api.auth.service.AuthenService;
+import com.api.common.constant.CommonConstants;
+import com.api.common.model.CommonResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,32 +31,25 @@ public class AuthController {
     @Operation(summary = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest req) {
-        return ResponseEntity.ok(CommonResponse.<LoginResponse>builder()
-                .successOrNot(CommonConstants.YES_FLAG)
-                .statusCode(ErrorCode.SUCCESS.getCode())
-                .data(authService.login(req))
-                .build());
+        return ResponseEntity.ok(CommonResponse.success(authService.login(req)));
     }
 
     @Operation(summary = "Đăng xuất")
     @PostMapping(value = "/logout")
     public ResponseEntity<CommonResponse<String>> logout() {
         return ResponseEntity.ok(
-                CommonResponse.<String>builder()
-                        .successOrNot(CommonConstants.YES_FLAG)
-                        .statusCode(ErrorCode.SUCCESS.getCode())
-                        .data(authService.logout())
-                        .build());
+                CommonResponse.success(authService.logout()));
     }
 
-    @Operation(summary = "Quên mật khẩu")
-    @GetMapping(value = "/forgotPassword/{username}")
-    public ResponseEntity<CommonResponse<String>> forgotPassword(@PathVariable("username") String username) {
-        return ResponseEntity.ok(
-                CommonResponse.<String>builder()
-                        .successOrNot(CommonConstants.YES_FLAG)
-                        .statusCode(ErrorCode.SUCCESS.getCode())
-                        .data(authService.handleForgotPassword(username))
-                        .build());
-    }
+    // @Operation(summary = "Quên mật khẩu")
+    // @GetMapping(value = "/forgotPassword/{username}")
+    // public ResponseEntity<CommonResponse<String>>
+    // forgotPassword(@PathVariable("username") String username) {
+    // return ResponseEntity.ok(
+    // CommonResponse.<String>builder()
+    // .successOrNot(CommonConstants.YES_FLAG)
+    // .statusCode(ErrorCode.SUCCESS.getCode())
+    // .data(authService.handleForgotPassword(username))
+    // .build());
+    // }
 }

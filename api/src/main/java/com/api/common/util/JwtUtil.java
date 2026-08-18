@@ -8,7 +8,8 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import backend.auth.service.UserDetailsImpl;
+import com.api.auth.service.UserDetailsImpl;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -43,9 +44,6 @@ public class JwtUtil {
                 .setExpiration(expiryDate)
                 .claim("id", user.getId())
                 .claim("username", user.getUsername())
-                .claim("tenant_id", user.getTenantId())
-                .claim("role", user.getRole())
-                .claim("functions", user.getFunctions())
                 .signWith(Keys.hmacShaKeyFor(accessSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }

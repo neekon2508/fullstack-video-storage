@@ -9,9 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import backend.function.repository.FunctionRepository;
-import backend.user.entity.User;
-import backend.user.repository.UserRepository;
+import com.api.user.entity.User;
+import com.api.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final FunctionRepository functionRepository;
+    // private final FunctionRepository functionRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -29,24 +29,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (optUser.isEmpty())
             throw new UsernameNotFoundException("User not found: " + username);
         User user = optUser.get();
-        if (user.getStatus() != 1)
+        if (user.getIsActive())
             throw new DisabledException("Account is locked: " + username);
-        String role = user.getRoleId();
-        List<String> functions = functionRepository.findAllByRoleId(role).stream().map(function -> function.getUrl())
-                .toList();
         return UserDetailsImpl
                 .builder()
                 .id(user.getId())
                 .username(username)
-                .password(user.getPassword())
-                .tenantId(user.getTenantId())
+                .password(user.getPasswordHash())
                 .email(user.getEmail())
-                .phone(user.getPhone())
-                .fullName(user.getFullName())
-                .avatar(user.getAvatar())
-                .signature(user.getSignature())
-                .role(user.getRoleId())
-                .functions(functions)
                 .build();
     }
 

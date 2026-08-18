@@ -1,8 +1,7 @@
-package backend.common.filter;
+package com.api.common.filter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,14 +11,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.api.auth.service.UserDetailsImpl;
+import com.api.common.constant.CommonConstants;
+import com.api.common.exception.ErrorCode;
+import com.api.common.model.CommonResponse;
+import com.api.common.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import backend.auth.service.UserDetailsImpl;
-import backend.common.constant.CommonConstants;
-import backend.common.exception.ErrorCode;
-import backend.common.model.CommonResponse;
-import backend.common.tenant.TenantContext;
-import backend.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -58,17 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Claims claims = jwtUtil.extractClaims(token, false);
                     Long id = claims.get("id", Long.class);
                     String username = claims.get("username", String.class);
-                    Integer tenantId = claims.get("tenant_id", Integer.class);
-                    String role = claims.get("role", String.class);
-                    List<String> functions = (List<String>) claims.get("functions", List.class);
-                    TenantContext.setTenantId(tenantId);
                     UserDetailsImpl userDetails = UserDetailsImpl
                             .builder()
                             .id(id)
                             .username(username)
-                            .tenantId(tenantId)
-                            .role(role)
-                            .functions(functions)
                             .build();
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, Collections.emptyList());
@@ -88,8 +79,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error("[JwtAuthenticationFilter] Lỗi xác thực: {}", e.getMessage(), e);
             handleException(response, ErrorCode.AUTH_ERROR.getCode(), HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            TenantContext.clear();
         }
     }
 

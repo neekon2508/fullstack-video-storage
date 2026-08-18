@@ -1,22 +1,16 @@
-package com.api.user_permission.entity;
+package com.api.user_role.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import com.api.common.constant.PermissionEffect;
-
 @Entity
-@Table(name = "user_permissions")
-public class UserPermission {
+@Table(name = "user_roles")
+public class UserRole {
 
     @EmbeddedId
     private Id id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 8)
-    private PermissionEffect effect;
 
     @Column(name = "granted_at", insertable = false, updatable = false)
     private LocalDateTime grantedAt;
@@ -24,18 +18,21 @@ public class UserPermission {
     @Column(name = "granted_by")
     private Long grantedBy;
 
+    /** NULL = vĩnh viễn. Role hết hạn không được tính khi resolve permission. */
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    protected UserPermission() {
+    protected UserRole() {
+    }
+
+    public UserRole(Long userId, Long roleId, Long grantedBy, LocalDateTime expiresAt) {
+        this.id = new Id(userId, roleId);
+        this.grantedBy = grantedBy;
+        this.expiresAt = expiresAt;
     }
 
     public Id getId() {
         return id;
-    }
-
-    public PermissionEffect getEffect() {
-        return effect;
     }
 
     public LocalDateTime getExpiresAt() {
@@ -47,23 +44,23 @@ public class UserPermission {
         @Column(name = "user_id")
         private Long userId;
 
-        @Column(name = "permission_id")
-        private Long permissionId;
+        @Column(name = "role_id")
+        private Long roleId;
 
         protected Id() {
         }
 
-        public Id(Long userId, Long permissionId) {
+        public Id(Long userId, Long roleId) {
             this.userId = userId;
-            this.permissionId = permissionId;
+            this.roleId = roleId;
         }
 
         public Long getUserId() {
             return userId;
         }
 
-        public Long getPermissionId() {
-            return permissionId;
+        public Long getRoleId() {
+            return roleId;
         }
 
         @Override
@@ -73,12 +70,12 @@ public class UserPermission {
             if (!(o instanceof Id))
                 return false;
             Id id = (Id) o;
-            return Objects.equals(userId, id.userId) && Objects.equals(permissionId, id.permissionId);
+            return Objects.equals(userId, id.userId) && Objects.equals(roleId, id.roleId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(userId, permissionId);
+            return Objects.hash(userId, roleId);
         }
     }
 }

@@ -21,9 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-    name = "roles"
-)
+@Table(name = "roles")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -44,10 +42,8 @@ public class Role {
     @Column(name = "description", length = 512)
     private String description;
 
-    // Quan hệ tự tham chiếu (Self-referencing relationship)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_role_id")
-    private Role parentRole;
+    @Column(name = "parent_role_id")
+    private Long parentRoleId;
 
     @Builder.Default
     @Column(name = "is_system", nullable = false)

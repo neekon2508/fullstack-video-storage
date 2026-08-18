@@ -8,15 +8,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import backend.auth.dto.request.LoginRequest;
-import backend.auth.dto.response.LoginResponse;
-import backend.common.exception.BusinessException;
-import backend.common.exception.ErrorCode;
-import backend.common.util.JwtUtil;
-import backend.mail.service.EmailService;
-import backend.user.dto.UserDTO;
-import backend.user.entity.User;
-import backend.user.repository.UserRepository;
+import com.api.auth.dto.LoginRequest;
+import com.api.auth.dto.LoginResponse;
+import com.api.common.exception.BusinessException;
+import com.api.common.exception.ErrorCode;
+import com.api.common.util.JwtUtil;
+import com.api.user.entity.User;
+import com.api.user.repository.UserRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +26,6 @@ public class AuthenServiceImpl implements AuthenService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final EmailService emailService;
 
     @Override
     public LoginResponse login(LoginRequest login) {
@@ -58,22 +56,23 @@ public class AuthenServiceImpl implements AuthenService {
         return "Đăng xuất thành công";
     }
 
-    @Override
-    @Transactional
-    public String handleForgotPassword(String username) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isEmpty())
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND.getMessage(), ErrorCode.USER_NOT_FOUND.getCode());
-        User user = userOpt.get();
-        String mail = user.getEmail();
-        String newPass = String.format("%06d", new Random().nextInt(999999));
-        UserDTO userDto = UserDTO.fromEntity(user);
-        userDto.setPassword(newPass);
-        int count = userRepository.updateUser(userDto);
-        if (count == 0)
-            throw new BusinessException(ErrorCode.USER_UPDATE_FAIL.getMessage(), ErrorCode.USER_UPDATE_FAIL.getCode());
-        emailService.sendForgotPasswordEmail(mail, username, newPass);
-        return "Mật khẩu mới đã được gửi về email: " + mail;
-    }
+    // @Override
+    // @Transactional
+    // public String handleForgotPassword(String username) {
+    // Optional<User> userOpt = userRepository.findByUsername(username);
+    // if (userOpt.isEmpty())
+    // throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+    // User user = userOpt.get();
+    // String mail = user.getEmail();
+    // String newPass = String.format("%06d", new Random().nextInt(999999));
+    // UserDTO userDto = UserDTO.fromEntity(user);
+    // userDto.setPassword(newPass);
+    // int count = userRepository.updateUser(userDto);
+    // if (count == 0)
+    // throw new BusinessException(ErrorCode.USER_UPDATE_FAIL.getMessage(),
+    // ErrorCode.USER_UPDATE_FAIL.getCode());
+    // emailService.sendForgotPasswordEmail(mail, username, newPass);
+    // return "Mật khẩu mới đã được gửi về email: " + mail;
+    // }
 
 }

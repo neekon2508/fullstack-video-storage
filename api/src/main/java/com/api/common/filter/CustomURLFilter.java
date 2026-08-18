@@ -9,7 +9,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import backend.log.service.LoggingService;
+import com.api.log.LoggingService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +20,10 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 @Order(1)
-public class CustomURLFilter extends OncePerRequestFilter{
+public class CustomURLFilter extends OncePerRequestFilter {
 
     private final LoggingService loggingService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -33,7 +35,8 @@ public class CustomURLFilter extends OncePerRequestFilter{
             filterChain.doFilter(wrappedRequest, wrappedResponse);
         } finally {
             loggingService.logRequest(wrappedRequest, new String(wrappedRequest.getContentAsByteArray()));
-            loggingService.logResponse(wrappedRequest, wrappedResponse, new String(wrappedResponse.getContentAsByteArray()));
+            loggingService.logResponse(wrappedRequest, wrappedResponse,
+                    new String(wrappedResponse.getContentAsByteArray()));
             wrappedResponse.copyBodyToResponse();
         }
     }

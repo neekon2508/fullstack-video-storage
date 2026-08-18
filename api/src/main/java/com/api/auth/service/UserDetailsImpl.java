@@ -3,6 +3,7 @@ package com.api.auth.service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +24,7 @@ import lombok.Setter;
 public class UserDetailsImpl implements UserDetails {
 
     private Long id;
-    
+
     private String username;
 
     private String password;
@@ -42,7 +43,8 @@ public class UserDetailsImpl implements UserDetails {
 
     private String role;
 
-    private List<String> functions;
+    @Builder.Default
+    private final Set<String> permissions = Collections.emptySet();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,6 +59,14 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public Set<String> getFunctions() {
+        return permissions;
+    }
+
+    public boolean hasPermission(String permissionCode) {
+        return permissions != null && permissions.contains(permissionCode);
     }
 
     @Override

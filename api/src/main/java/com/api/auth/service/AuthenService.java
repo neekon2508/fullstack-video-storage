@@ -8,5 +8,5 @@ public interface AuthenService {
 
     String logout();
 
-    String handleForgotPassword(String username);
+    // String handleForgotPassword(String username);
 }
