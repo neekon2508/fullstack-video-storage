@@ -39,14 +39,18 @@ dependencies {
     // OpenAPI / Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 	
-    // Lombok
-    implementation 'org.projectlombok:lombok:1.18.30'
+
+    // 1. Lombok (Đảm bảo dùng bản 1.18.32+ hỗ trợ mượt mà cho Java 21)
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    // 2. Binding giữa Lombok và MapStruct (phải đứng SAU Lombok và TRƯỚC MapStruct Processor)
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // 3. MapStruct
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.mapstruct:mapstruct-lombok-binding:0.2.0'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'	// JWT
-    
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'   
+     
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
@@ -63,6 +67,12 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+tasks.withType(JavaCompile) {
+    options.compilerArgs = [
+        '-Amapstruct.defaultComponentModel=spring'
+    ]
 }
+
+// tasks.named('test') {
+// 	useJUnitPlatform()
+// }

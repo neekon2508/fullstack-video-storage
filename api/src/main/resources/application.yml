@@ -44,13 +44,13 @@ jpa:
 jwt:
   access-token-secret-key: access-secret-key-access-secret-key
   refresh-token-secret-key: refresh-secret-key-refresh-secret-key
-  access-token-expiration-time: 36000
+  access-token-expiration-time: 120
   refresh-token-expiration-time: 604800
 
 request:
   cookie:
     refresh-cookie-name: MOVIE_REFRESH-TOKEN
-    secure: false                              # prd: true
+    secure: false # prd: true
     same-site: Lax
 
 google:
@@ -67,7 +67,7 @@ logging:
 security:
   secret-key: AES
   algorithm: U#(&^#*NAd123
-  
+
 ---
 spring:
   config:

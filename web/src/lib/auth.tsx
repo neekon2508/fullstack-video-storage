@@ -6,27 +6,41 @@ import { paths } from '@/config/paths';
 import { AuthResponse, User } from '@/types/api';
 
 import { api } from './api-client';
+import { refreshToken } from './refresh-token';
+import { useTokenStore } from './token-store';
 
-// api call definitions for auth (types, schemas, requests):
-// these are not part of features as this is a module shared across features
 
-// const getUser = async (): Promise<User> => {
-//   const response = await api.get('/login');
+const getUser = async (): Promise<User | null> => {
+  try {
+    // /auth/refresh đã trả về user kèm access token mới, không cần gọi thêm /auth/me
+    const result = await refreshToken();
+    return result?.user ?? null;
+  } catch {
+    // Trả về null thay vì throw error để AuthLoader hiểu là người dùng chưa đăng nhập
+    return null;
+  }
+};
 
-//   return response.data;
-// };
 
-const logout = (): Promise<void> => {
-  return api.post('/auth/logout');
+const logout = async  (): Promise<void> => {
+  try {
+    await api.post('/auth/logout');
+  } finally {
+    // Luôn đảm bảo clear token ở client ngay cả khi request gặp lỗi
+    useTokenStore.getState().clearToken();
+  }
 };
 
 export const loginInputSchema = z.object({
-  email: z.string().min(1, 'Required').email('Invalid email'),
+  username: z.string().min(1, 'Required'),
   password: z.string().min(5, 'Required'),
 });
 
 export type LoginInput = z.infer<typeof loginInputSchema>;
-const loginWithEmailAndPassword = (data: LoginInput): Promise<AuthResponse> => {
+
+const loginWithUsernameAndPassword = (
+  data: LoginInput,
+): Promise<AuthResponse> => {
   return api.post('/auth/login', data);
 };
 
@@ -60,9 +74,11 @@ const registerWithEmailAndPassword = (
 };
 
 const authConfig = {
-  // userFn: getUser,
+  userFn: getUser,
   loginFn: async (data: LoginInput) => {
-    const response = await loginWithEmailAndPassword(data);
+    const response = await loginWithUsernameAndPassword(data);
+    // Lưu accessToken vào Zustand store trước khi trả về user object
+    useTokenStore.getState().setAccessToken(response.accessToken);
     return response.user;
   },
   registerFn: async (data: RegisterInput) => {

@@ -14,6 +14,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,9 @@ public class JwtUtil {
 
     @Value("${jwt.refresh-token-expiration-time}")
     private long refreshExp;
+
+    @Value("${request.cookie.refresh-cookie-name}")
+    private String refreshCookieName;
 
     public String generateAccessToken(Long id, String username) {
         LocalDateTime expiry = LocalDateTime.now().plus(Duration.ofSeconds(accessExp));
@@ -101,5 +105,14 @@ public class JwtUtil {
             return 0;
         }
 
+    }
+
+    public Cookie createRefreshTokenCookie(String refreshToken) {
+        Cookie cookie = new Cookie(refreshCookieName, refreshToken);
+        cookie.setMaxAge((int) refreshExp);
+        cookie.setSecure(false);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/movie");
+        return cookie;
     }
 }

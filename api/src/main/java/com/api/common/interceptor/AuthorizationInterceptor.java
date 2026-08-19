@@ -35,11 +35,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         RequirePermission required = handlerMethod.getMethodAnnotation(RequirePermission.class);
         if (required == null)
             required = handlerMethod.getBeanType().getAnnotation(RequirePermission.class);
-        // API không khai báo @RequirePermission -> chỉ cần đã authenticate (JwtAuthenticationFilter
+        // API không khai báo @RequirePermission -> chỉ cần đã authenticate
+        // (JwtAuthenticationFilter
         // đã chặn từ trước nếu chưa có token hợp lệ), không kiểm tra permission cụ thể.
         if (required == null)
             return true;
-       UserDetailsImpl user = SecurityUtil.getUserDetails();
+        UserDetailsImpl user = SecurityUtil.getUserDetails();
         String uri = request.getServletPath();
         if (user == null || !user.hasPermission(required.value())) {
             log.error("Inaccessible Api, Access url is {}, required permission is {}", uri, required.value());
@@ -58,11 +59,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                 .build();
         String json = objectMapper.writeValueAsString(responseBody);
 
-        String origin = request.getHeader("Origin");
-        if (origin != null) {
-            response.setHeader("Access-Control-Allow-Origin", origin);
-            response.setHeader("Access-Control-Allow-Credentials", "true");
-        }
+        // String origin = request.getHeader("Origin");
+        // if (origin != null) {
+        // response.setHeader("Access-Control-Allow-Origin", origin);
+        // response.setHeader("Access-Control-Allow-Credentials", "true");
+        // }
 
         response.setStatus(200); // 200으로 처리
         response.setContentType("application/json;charset=UTF-8");

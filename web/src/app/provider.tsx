@@ -41,6 +41,23 @@ export const AppProvider = ({ children }: AppProviderProps) => {
                   <Spinner size="xl" />
                 </div>
               )}
+              renderError={(error) => (
+                <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
+                  <h2 className="text-lg font-semibold text-slate-800">
+                    Unable to load application state
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    {error?.message ||
+                      'Connection to server failed. Please check your network connection.'}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-2 rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
             >
               {children}
             </AuthLoader>

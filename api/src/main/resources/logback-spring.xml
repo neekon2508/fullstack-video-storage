@@ -7,7 +7,7 @@
 
     <!-- Định dạng hiển thị log -->
     <property name="LOG_PATTERN" 
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [tenant=%X{tenantId}] %-5level %logger{36} - %msg%n" />
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
 
     <!-- Appender ghi log ra File và Xoay vòng theo ngày -->
     <appender name="DAILY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">

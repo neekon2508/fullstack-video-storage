@@ -6,7 +6,7 @@ import org.mapstruct.Mappings;
 import com.api.user.UserDTO;
 import com.api.user.entity.User;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     @Mappings({
