@@ -40,7 +40,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return resolveEffectivePermissions(userId).contains(permissionCode);
     }
 
-    @Cacheable(cacheNames = "userEffectivePermissions", key = "#userId")
+    @Cacheable(cacheNames = "userEffectivePermissions", key = "#id")
     public Set<String> resolveEffectivePermissions(Long userId) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -90,7 +90,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     /** Gọi ngay sau khi admin gán/thu hồi role hoặc permission cho user. */
-    @CacheEvict(cacheNames = "userEffectivePermissions", key = "#userId")
+    @CacheEvict(cacheNames = "userEffectivePermissions", key = "#id")
     public void evictCache(Long userId) {
         // no-op
     }

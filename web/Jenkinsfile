@@ -1,0 +1,67 @@
+pipeline {
+    agent {
+        label 'Storage Movie'
+    }
+
+    environment {
+        USER = "movie"
+        APP_NAME        = "web"
+        DEPLOY_PATH     = "/datas/${USER}/${APP_NAME}"
+        BUILD_FOLDER    = "dist" 
+        INSTALL_CMD     = "npm install"
+        BUILD_CMD       = "npm run build"
+    }
+
+    stages {
+        stage('Check Environment') {
+            steps {
+                echo "--- Kiểm tra phiên bản Node & NPM ---"
+                sh 'node -v'
+                sh 'npm -v'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo "--- Đang cài đặt thư viện (npm install) ---"
+                dir('web') {
+                    sh 'npm install'
+                }            
+            }
+        }
+
+        stage('Build Production') {
+            steps {
+                echo "--- Đang biên dịch dự án Vite ---"
+                dir('web') { 
+                            sh 'npm run build'
+                        }            
+            }
+        }
+
+        stage('Deploy to Nginx') {
+            steps {
+                echo "--- Bắt đầu triển khai lên Nginx ---"
+                dir('web') {
+                    sh 'mkdir -p /datas/movie/web'
+                    sh 'rm -rf /datas/movie/web/*'
+                    sh 'cp -r dist/* /datas/movie/web/'
+                }
+                sh "sudo systemctl reload nginx"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Triển khai thành công ứng dụng: ${APP_NAME}"
+        }
+        failure {
+            echo "Build thất bại! Vui lòng kiểm tra lại Console Log."
+        }
+        always {
+            echo "--- Dọn dẹp Workspace ---"
+            cleanWs() 
+        }
+    }
+}

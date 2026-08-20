@@ -1,0 +1,36 @@
+pipeline {
+  agent {
+    label 'Storage Movie'
+  }
+  environment {
+    appUser = "movie"
+    appName = "api"
+    appVersion = "0.0.1"
+    appType = "jar"
+    processName = "${appName}-${appVersion}-SNAPSHOT.${appType}"
+    folderDeploy = "/datas/${appUser}"
+    buildScript = "./gradlew clean build -x test"
+    copyScript = "sudo cp api/build/libs/${processName} ${folderDeploy}"
+    permsScript = "sudo chown -R ${appUser}:${appUser} ${folderDeploy}"
+    killScript = "sudo pkill -9 -f ${processName} || true"
+    runScript = 'sudo su ${appUser} -c "cd ${folderDeploy}; java -jar ${processName} > nohup.out 2>&1 &"'
+  }
+  stages {
+    stage('build') {
+      steps {
+            dir('api') { 
+                sh label: "add execute permission", script: "chmod +x gradlew"
+                sh label: "build with gradle", script: "./gradlew clean build -x test"
+            }
+        }
+    }
+    stage('deploy') {
+      steps {
+        sh(script: """ ${copyScript} """, label: "Copy file jar")
+        sh(script: """ ${permsScript} """, label: "set permission folder")
+        sh(script: """ ${killScript} """, label: "terminate the running process")
+        sh(script: """ ${runScript} """, label: "run the project")
+      }
+    }
+  }
+}

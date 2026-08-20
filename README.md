@@ -22,7 +22,9 @@
 ## Frontend Development
 - Reference: https://github.com/alan2207/bulletproof-react
 ## Deployment
-
+- Jenkinsfile, Github
+-BE: port 9011
+-FE: port 5175
 ## Development
 
 ## Release Notes
