@@ -19,7 +19,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedOriginPatterns(
-                "http://localhost:3000"
+                "http://localhost:5175",
+                                  "http://neekon2508.onthewifi.com:83"
             )
             .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
             .exposedHeaders("Content-Disposition")
@@ -38,7 +39,8 @@ public class CorsConfig implements WebMvcConfigurer {
 
         // 허용할 Origin 목록
         List<String> allowedOrigins = Arrays.asList(
-            "http://localhost:3000"
+            "http://localhost:5175",
+                   "http://neekon2508.onthewifi.com:83" 
         );
 
         // allowCredentials(true)를 사용할 때는 allowedOriginPatterns 사용
