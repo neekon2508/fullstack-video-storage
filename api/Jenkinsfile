@@ -3,6 +3,7 @@ pipeline {
     label 'storage-movie'
   }
   environment {
+    GRADLE_USER_HOME = '/var/lib/jenkins/.gradle'
     appUser = "movie"
     appName = "api"
     appVersion = "0.0.1"
